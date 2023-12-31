@@ -30,16 +30,35 @@ const addToCart = async (req, res) => {
 };
 
 const fetchCartProducts = async (req, res) => {
+  const token = req.header('Authorization');
   try {
-    const { userId } = req.params;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const userId = decoded.userID;
 
-    const user = await User.findById(userId);
-
+    const user = await User.findById(userId).populate('cart.product');
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    const cartDetails = user.cart.map(item => {
+      const { _id, name, price, company, colour, type, about_item, images, featured } = item.product;
+      return {
+        _id: item._id,
+        product: {
+          _id,
+          name,
+          price,
+          company,
+          colour,
+          type,
+          about_item,
+          images,
+          featured
+        },
+        quantity: item.quantity
+      };
+    });
 
-    res.status(200).json(user.cart);
+    res.status(200).json( cartDetails);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }

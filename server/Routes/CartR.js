@@ -1,4 +1,5 @@
 const express = require("express");
+import requireAuth from "../middleware/authMiddleware.js";
 const {
   addToCart,
   fetchCartProducts,
@@ -11,7 +12,7 @@ const {
 const router = express.Router();
 
 router.post("/addtocart", addToCart);
-router.get("/:userId", fetchCartProducts);
+router.get("/get_cart",requireAuth, fetchCartProducts);
 router.post("/update", updateCart);
 router.delete("/:userId/:productId", removeFromCart);
 router.post("/clear/:userId", clearCart);
