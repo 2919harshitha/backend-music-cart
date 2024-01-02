@@ -36,6 +36,6 @@ app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
 
-app.use(AuthRoute);
-app.use(ProductRoute);
-app.use(CartRoute);
+app.use("/",AuthRoute);
+app.use("/",ProductRoute);
+app.use("/", CartRoute);
