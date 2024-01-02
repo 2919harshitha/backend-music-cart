@@ -29,7 +29,7 @@ const addToCart = async (req, res) => {
   }
 };
 
-const fetchCartProducts = async (req, res) => {
+const getCartProducts = async (req, res) => {
   const token = req.header('Authorization');
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
@@ -109,20 +109,18 @@ const removeFromCart = async (req, res) => {
 };
 
 const clearCart = async (req, res) => {
+  const token = req.header('Authorization');
   try {
-    const { userId } = req.params;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const id = decoded.userID;
 
-    const user = await User.findById(userId);
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { cart: [] },
+      { new: true }
+    );
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    user.cart = [];
-
-    await user.save();
-
-    res.status(200).json({ message: "Cart cleared" });
+    res.status(200).json({ message:'Cart cleared successfully', user: updatedUser });
   } catch (error) {
     res.status(500).json({ message: "Failed to clear cart", error });
   }
@@ -154,7 +152,7 @@ const checkoutCart = async (req, res) => {
 };
 module.exports = {
   addToCart,
-  fetchCartProducts,
+  getCartProducts,
   updateCart,
   removeFromCart,
   clearCart,
